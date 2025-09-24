@@ -1,0 +1,6 @@
+@PureWaterBackend_HostAddress = http://localhost:5074
+
+GET {{PureWaterBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
