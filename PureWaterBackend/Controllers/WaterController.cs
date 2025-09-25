@@ -107,20 +107,21 @@ public class WaterController : ControllerBase
     {
          DateOnly dateOnly = DateOnly.FromDateTime(date);
         if (dateOnly > DateOnly.FromDateTime(DateTime.Now))  return BadRequest ("Date cannot be in the future");
+        if (dateOnly < DateOnly.FromDateTime(DateTime.Now).AddDays(-90)) return BadRequest("Date is too far in the past. Can only get data for the last 30 days.");
          try
-        { 
+        {
             //TODO: need to add a check for the user is a current user later. Remove googleId from the input, replace next 3 lines with with the following:
             // int? userId =await CurrentUserIdAsync();
             // if (userId == null) return Unauthorized(); 
             User? user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
             if (user == null) return Unauthorized();
             int userId = user.Id;
-        
+
             var water = await _context.Water.FirstOrDefaultAsync(w => w.UserId == userId && w.Date == dateOnly);
             if (water == null) return NotFound();
             return Ok(ToWaterDto(water));
 
-         }
+        }
         catch (Exception)
         {
             throw;
@@ -145,7 +146,7 @@ public class WaterController : ControllerBase
             return NotFound();
         }
 
-        return water;
+        return Ok(water);
     }   
     
     private bool WaterExists(int id)
